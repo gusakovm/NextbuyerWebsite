@@ -1,0 +1,27 @@
+User-Agent: *
+Disallow: /page46573819.html
+Disallow: /demo/
+Disallow: /page46637503.html
+Disallow: /demo/step3/
+Disallow: /page46643015.html
+Disallow: /demo/step2/
+Disallow: /page48982199.html
+Disallow: /integration/final
+Disallow: /page52899881.html
+Disallow: /integration/final-pipedrive-develop
+Disallow: /page52913477.html
+Disallow: /integration/final-pipedrive
+Disallow: /tilda/form*
+Disallow: /tilda/rec*
+Disallow: /tilda/click*
+Disallow: /tilda/scroll*
+Disallow: /tilda/popup*
+Disallow: /tilda/cart*
+Disallow: /tilda/product*
+Disallow: /tilda/event*
+Disallow: /*_escaped_fragment_*
+Disallow:
+
+
+Sitemap: https://nextbuyer.ai/sitemap.xml
+Host: https://nextbuyer.ai
