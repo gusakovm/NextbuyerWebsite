@@ -1,0 +1,65 @@
+ErrorDocument 403 /404.html
+ErrorDocument 404 /404.html
+
+DirectoryIndex page47866911.html
+
+RewriteEngine On
+
+RewriteCond %{HTTP:X-Forwarded-Proto} =http
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+RewriteCond %{REQUEST_FILENAME} /robots.txt
+RewriteCond "%{DOCUMENT_ROOT}/robots_%{HTTP_HOST}.txt" -f
+RewriteRule ^(.*)$ robots_%{HTTP_HOST}.txt [NC,L]
+RewriteRule ^draft0000$ page47051277.html [NC]
+RewriteRule ^draft0000/$ page47051277.html [NC]
+
+RewriteRule ^demo/$ page46573819.html [NC]
+RewriteRule ^demo//$ page46573819.html [NC]
+
+RewriteRule ^index$ page47866911.html [NC]
+RewriteRule ^index/$ page47866911.html [NC]
+
+RewriteRule ^draft0001$ page47118379.html [NC]
+RewriteRule ^draft0001/$ page47118379.html [NC]
+
+RewriteRule ^demo/step3/$ page46637503.html [NC]
+RewriteRule ^demo/step3//$ page46637503.html [NC]
+
+RewriteRule ^form$ page48695621.html [NC]
+RewriteRule ^form/$ page48695621.html [NC]
+
+RewriteRule ^demo/step2/$ page46643015.html [NC]
+RewriteRule ^demo/step2//$ page46643015.html [NC]
+
+RewriteRule ^draft0002$ page47336575.html [NC]
+RewriteRule ^draft0002/$ page47336575.html [NC]
+
+RewriteRule ^draft0003$ page47492663.html [NC]
+RewriteRule ^draft0003/$ page47492663.html [NC]
+
+RewriteRule ^new/welcome$ page48717985.html [NC]
+RewriteRule ^new/welcome/$ page48717985.html [NC]
+
+RewriteRule ^new/$ page48871171.html [NC]
+RewriteRule ^new//$ page48871171.html [NC]
+
+RewriteRule ^draft0006$ page48871679.html [NC]
+RewriteRule ^draft0006/$ page48871679.html [NC]
+
+RewriteRule ^integration/final$ page48982199.html [NC]
+RewriteRule ^integration/final/$ page48982199.html [NC]
+
+RewriteRule ^integration/final-pipedrive-develop$ page52899881.html [NC]
+RewriteRule ^integration/final-pipedrive-develop/$ page52899881.html [NC]
+
+RewriteRule ^integration/final-pipedrive$ page52913477.html [NC]
+RewriteRule ^integration/final-pipedrive/$ page52913477.html [NC]
+
+RewriteRule ^payment_success$ page58480689.html [NC]
+RewriteRule ^payment_success/$ page58480689.html [NC]
+
+RewriteRule ^payment_canceled$ page58481183.html [NC]
+RewriteRule ^payment_canceled/$ page58481183.html [NC]
+
+
