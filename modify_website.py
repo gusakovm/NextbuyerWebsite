@@ -192,8 +192,8 @@ def add_form_handler(content):
 </script>
 '''
 
-    # Insert before tilda-stat
-    anchor = "window.tildastatcookie='no';"
+    # Insert before tilda-stat comment
+    anchor = "<!-- Stat -->"
     if anchor in content:
         print("  - Inserting form handler script before tilda-stat...")
         content = content.replace(anchor, form_handler + '\n' + anchor)
