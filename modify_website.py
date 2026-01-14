@@ -85,7 +85,6 @@ def add_contact_buttons_handler(content):
 (function() {
     'use strict';
 
-    var CONTACT_ELEM_IDS = ['1712930274140', '1713892925923'];
     var FIRST_FORM_REC = '739844601';
 
     function scrollToFirstForm() {
@@ -111,33 +110,25 @@ def add_contact_buttons_handler(content):
     function initContactButtons() {
         console.log('[Nextbuyer] Initializing Contact us buttons...');
 
-        CONTACT_ELEM_IDS.forEach(function(elemId) {
-            var elem = document.querySelector('[data-elem-id="' + elemId + '"]');
-            if (!elem) {
-                elem = document.querySelector("[data-elem-id='" + elemId + "']");
-            }
+        // Find all links to /new/ and intercept them
+        var links = document.querySelectorAll('a[href="/new/"]');
 
-            if (!elem) {
-                console.log('[Nextbuyer] Contact button not found:', elemId);
-                return;
-            }
+        console.log('[Nextbuyer] Found ' + links.length + ' links to /new/');
 
-            // Find link inside and prevent default
-            var link = elem.querySelector('a');
-            if (link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    console.log('[Nextbuyer] Contact us clicked:', elemId);
-                    scrollToFirstForm();
-                    return false;
-                }, true);
-                console.log('[Nextbuyer] Contact button handler attached:', elemId);
-            } else {
-                console.log('[Nextbuyer] No link found in:', elemId);
-            }
+        links.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('[Nextbuyer] Contact us link clicked, scrolling to form');
+                scrollToFirstForm();
+                return false;
+            }, true);
         });
+
+        if (links.length > 0) {
+            console.log('[Nextbuyer] Attached handlers to ' + links.length + ' Contact us links');
+        }
     }
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
