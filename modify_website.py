@@ -80,12 +80,77 @@ def replace_fonts(content):
 def add_form_handler(content):
     """Add custom form handler before tilda-stat"""
 
-    form_handler = '''<script>
+    form_handler = '''<style>
+/* Toast notification styles */
+.nb-toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 999999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.nb-toast.show {
+    opacity: 1;
+}
+.nb-toast.success {
+    background: #10b981;
+}
+.nb-toast.error {
+    background: #ef4444;
+}
+.nb-toast.info {
+    background: #3b82f6;
+}
+</style>
+<script>
 // Custom form handler for Nextbuyer email capture forms
 (function() {
     'use strict';
 
     var TARGET_RECS = ['739844601', '739844630'];
+
+    // Toast notification function
+    function showToast(message, type) {
+        type = type || 'info';
+
+        // Remove existing toast if any
+        var existingToast = document.getElementById('nb-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        // Create toast element
+        var toast = document.createElement('div');
+        toast.id = 'nb-toast';
+        toast.className = 'nb-toast ' + type;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        // Show toast with animation
+        setTimeout(function() {
+            toast.classList.add('show');
+        }, 10);
+
+        // Hide and remove after 3 seconds
+        setTimeout(function() {
+            toast.classList.remove('show');
+            setTimeout(function() {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 300);
+        }, 3000);
+    }
 
     function initFormHandler() {
         console.log('[Nextbuyer] Initializing custom form handler...');
@@ -118,19 +183,19 @@ def add_form_handler(content):
                 var emailInput = rec.querySelector('input[type="email"], input[name="email"], input[placeholder*="email" i]');
                 if (!emailInput) {
                     console.error('[Nextbuyer] Email input not found');
-                    alert('Form error. Please try again.');
+                    showToast('Form error. Please try again.', 'error');
                     return false;
                 }
 
                 var email = emailInput.value.trim();
                 if (!email) {
-                    alert('Please enter your email address.');
+                    showToast('Please enter your email address.', 'info');
                     return false;
                 }
 
                 // Simple email validation
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    alert('Please enter a valid email address.');
+                    showToast('Please enter a valid email address.', 'error');
                     return false;
                 }
 
@@ -152,16 +217,16 @@ def add_form_handler(content):
                 .then(function(response) {
                     if (response.ok) {
                         console.log('[Nextbuyer] Submission successful');
-                        alert('Thank you! Your submission has been received.');
+                        showToast('Thank you! Your submission has been received.', 'success');
                         emailInput.value = '';
                     } else {
                         console.error('[Nextbuyer] API error:', response.status);
-                        alert('Submission failed. Please try again later.');
+                        showToast('Submission failed. Please try again later.', 'error');
                     }
                 })
                 .catch(function(error) {
                     console.error('[Nextbuyer] Network error:', error);
-                    alert('Network error. Please check your connection.');
+                    showToast('Network error. Please check your connection.', 'error');
                 })
                 .finally(function() {
                     submitBtn.disabled = false;
