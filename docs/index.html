@@ -360,35 +360,62 @@ hidden > <div class="t585__textwrapper"> <div class="t585__text t-descr t-descr_
         }, 800);
     }
 
-    function initContactButtons() {
-        console.log('[Nextbuyer] Initializing Contact us buttons...');
-
+    function attachHandlers() {
         // Find all links to /new/ and intercept them
         var links = document.querySelectorAll('a[href="/new/"]');
+
+        if (links.length === 0) {
+            return;
+        }
 
         console.log('[Nextbuyer] Found ' + links.length + ' links to /new/');
 
         links.forEach(function(link) {
+            // Remove href to prevent navigation
+            link.setAttribute('data-original-href', link.getAttribute('href'));
+            link.removeAttribute('href');
+            link.style.cursor = 'pointer';
+
+            // Add multiple event listeners for safety
+            link.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('[Nextbuyer] Contact us link clicked (onclick), scrolling to form');
+                scrollToFirstForm();
+                return false;
+            };
+
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
-                console.log('[Nextbuyer] Contact us link clicked, scrolling to form');
+                console.log('[Nextbuyer] Contact us link clicked (listener), scrolling to form');
                 scrollToFirstForm();
                 return false;
             }, true);
         });
 
-        if (links.length > 0) {
-            console.log('[Nextbuyer] Attached handlers to ' + links.length + ' Contact us links');
-        }
+        console.log('[Nextbuyer] Attached handlers to ' + links.length + ' Contact us links');
+    }
+
+    function initContactButtons() {
+        console.log('[Nextbuyer] Initializing Contact us buttons...');
+
+        // Attach handlers immediately
+        attachHandlers();
+
+        // Re-attach after Tilda might have initialized (multiple times)
+        setTimeout(attachHandlers, 1000);
+        setTimeout(attachHandlers, 2000);
+        setTimeout(attachHandlers, 3000);
     }
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(initContactButtons, 500);
+        setTimeout(initContactButtons, 100);
     } else {
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initContactButtons, 500);
+            setTimeout(initContactButtons, 100);
         });
     }
 })();
