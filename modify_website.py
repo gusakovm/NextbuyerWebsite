@@ -85,7 +85,7 @@ def add_contact_buttons_handler(content):
 (function() {
     'use strict';
 
-    var CONTACT_ELEM_IDS = ['1712930274148', '1713892925926'];
+    var CONTACT_ELEM_IDS = ['1712930274140', '1713892925923'];
     var FIRST_FORM_REC = '739844601';
 
     function scrollToFirstForm() {
@@ -122,14 +122,21 @@ def add_contact_buttons_handler(content):
                 return;
             }
 
-            elem.style.cursor = 'pointer';
-            elem.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('[Nextbuyer] Contact us clicked:', elemId);
-                scrollToFirstForm();
-            });
-
-            console.log('[Nextbuyer] Contact button handler attached:', elemId);
+            // Find link inside and prevent default
+            var link = elem.querySelector('a');
+            if (link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('[Nextbuyer] Contact us clicked:', elemId);
+                    scrollToFirstForm();
+                    return false;
+                }, true);
+                console.log('[Nextbuyer] Contact button handler attached:', elemId);
+            } else {
+                console.log('[Nextbuyer] No link found in:', elemId);
+            }
         });
     }
 
@@ -193,7 +200,7 @@ def add_form_handler(content):
 (function() {
     'use strict';
 
-    var TARGET_RECS = ['739844601', '739844630'];
+    var TARGET_RECS = ['739844601', '739844630', '739844614'];
 
     // Toast notification function
     function showToast(message, type) {
