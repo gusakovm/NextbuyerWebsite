@@ -77,6 +77,82 @@ def replace_fonts(content):
 
     return content
 
+def add_contact_buttons_handler(content):
+    """Add handler for Contact us buttons to scroll to first form"""
+
+    contact_handler = '''<script>
+// Contact us buttons handler - scroll to first form
+(function() {
+    'use strict';
+
+    var CONTACT_ELEM_IDS = ['1712930274148', '1713892925926'];
+    var FIRST_FORM_REC = '739844601';
+
+    function scrollToFirstForm() {
+        var firstForm = document.getElementById('rec' + FIRST_FORM_REC);
+        if (!firstForm) {
+            console.log('[Nextbuyer] First form not found');
+            return;
+        }
+
+        // Scroll to form
+        firstForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Wait for scroll, then focus email input
+        setTimeout(function() {
+            var emailInput = firstForm.querySelector('input[type="email"], input[name="email"], input[placeholder*="email" i]');
+            if (emailInput) {
+                emailInput.focus();
+                console.log('[Nextbuyer] Focused on email input');
+            }
+        }, 800);
+    }
+
+    function initContactButtons() {
+        console.log('[Nextbuyer] Initializing Contact us buttons...');
+
+        CONTACT_ELEM_IDS.forEach(function(elemId) {
+            var elem = document.querySelector('[data-elem-id="' + elemId + '"]');
+            if (!elem) {
+                elem = document.querySelector("[data-elem-id='" + elemId + "']");
+            }
+
+            if (!elem) {
+                console.log('[Nextbuyer] Contact button not found:', elemId);
+                return;
+            }
+
+            elem.style.cursor = 'pointer';
+            elem.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('[Nextbuyer] Contact us clicked:', elemId);
+                scrollToFirstForm();
+            });
+
+            console.log('[Nextbuyer] Contact button handler attached:', elemId);
+        });
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(initContactButtons, 500);
+    } else {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initContactButtons, 500);
+        });
+    }
+})();
+</script>
+'''
+
+    anchor = "<!-- Stat -->"
+    if anchor in content:
+        print("  - Inserting Contact us buttons handler...")
+        content = content.replace(anchor, contact_handler + '\n' + anchor)
+    else:
+        print("  ⚠️  WARNING: Could not find insertion point for Contact handler")
+
+    return content
+
 def add_form_handler(content):
     """Add custom form handler before tilda-stat"""
 
@@ -269,15 +345,21 @@ def add_form_handler(content):
 
 def main():
     index_file = Path('docs/index.html')
+    original_file = Path('docs/index.html.original')
     backup_file = Path('docs/index.html.backup')
 
     print("="*70)
     print("Tilda Website Modifier")
     print("="*70)
 
-    # Read file
-    print(f"\n📖 Reading {index_file}...")
-    content = index_file.read_text(encoding='utf-8')
+    # Read from original (clean) file
+    if original_file.exists():
+        print(f"\n📖 Reading clean version from {original_file}...")
+        content = original_file.read_text(encoding='utf-8')
+    else:
+        print(f"\n📖 Reading {index_file}...")
+        content = index_file.read_text(encoding='utf-8')
+
     original_size = len(content)
 
     # Create backup
@@ -287,6 +369,9 @@ def main():
     # Apply transformations
     print(f"\n🔤 Replacing fonts with Inter...")
     content = replace_fonts(content)
+
+    print(f"\n🔘 Adding Contact us buttons handler...")
+    content = add_contact_buttons_handler(content)
 
     print(f"\n📝 Adding custom form handler...")
     content = add_form_handler(content)
