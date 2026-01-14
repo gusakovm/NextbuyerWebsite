@@ -339,78 +339,109 @@ hidden > <div class="t585__textwrapper"> <div class="t585__text t-descr t-descr_
 (function() {
     'use strict';
 
-    function waitForTildaForm() {
-        if (typeof window.tildaForm !== 'undefined') {
-            initCustomFormHandler();
-        } else {
-            setTimeout(waitForTildaForm, 100);
-        }
-    }
+    var TARGET_RECS = ['739844601', '739844630'];
 
-    function initCustomFormHandler() {
-        var originalSubmit = window.tildaForm.submit;
+    function initFormHandler() {
+        console.log('[Nextbuyer] Initializing custom form handler...');
 
-        window.tildaForm.submit = function(recid, formid, formoptions) {
-            console.log('Form submission:', {recid: recid});
-
-            // Only intercept our 2 email capture forms
-            if (recid !== '739844601' && recid !== '739844630') {
-                if (originalSubmit) {
-                    return originalSubmit.call(this, recid, formid, formoptions);
-                }
+        TARGET_RECS.forEach(function(recid) {
+            var rec = document.getElementById('rec' + recid);
+            if (!rec) {
+                console.log('[Nextbuyer] Record not found:', recid);
                 return;
             }
 
-            var form = document.querySelector('#rec' + recid + ' form');
-            if (!form) {
-                form = document.querySelector('#rec' + recid);
+            // Find submit button in this record
+            var submitBtn = rec.querySelector('button[type="submit"], .t-submit');
+            if (!submitBtn) {
+                console.log('[Nextbuyer] Submit button not found in:', recid);
+                return;
             }
 
-            if (!form) {
-                console.error('Form not found:', recid);
-                alert('Form submission error. Please try again.');
-                return false;
-            }
+            console.log('[Nextbuyer] Attaching handler to rec' + recid);
 
-            var formData = new FormData(form);
-            var data = {};
-            formData.forEach(function(value, key) {
-                data[key] = value;
-            });
+            // Attach click handler with capture phase (fires before Tilda)
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
 
-            console.log('Sending to custom endpoint:', data);
+                console.log('[Nextbuyer] Form submission intercepted for rec' + recid);
 
-            fetch('https://api.cdoc.cc/nextbuyer-step1', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(function(response) {
-                if (response.ok) {
-                    alert('Thank you! Your submission has been received.');
-                    if (form.reset) form.reset();
-                } else {
-                    alert('Submission failed. Please try again later.');
+                // Get email input
+                var emailInput = rec.querySelector('input[type="email"], input[name="email"], input[placeholder*="email" i]');
+                if (!emailInput) {
+                    console.error('[Nextbuyer] Email input not found');
+                    alert('Form error. Please try again.');
+                    return false;
                 }
-            })
-            .catch(function(error) {
-                console.error('Submission error:', error);
-                alert('Network error. Please check your connection.');
+
+                var email = emailInput.value.trim();
+                if (!email) {
+                    alert('Please enter your email address.');
+                    return false;
+                }
+
+                // Simple email validation
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    alert('Please enter a valid email address.');
+                    return false;
+                }
+
+                console.log('[Nextbuyer] Sending to API:', {email: email});
+
+                // Disable button
+                submitBtn.disabled = true;
+                var originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Sending...';
+
+                // Send to custom endpoint
+                fetch('https://api.cdoc.cc/nextbuyer-step1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({email: email})
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        console.log('[Nextbuyer] Submission successful');
+                        alert('Thank you! Your submission has been received.');
+                        emailInput.value = '';
+                    } else {
+                        console.error('[Nextbuyer] API error:', response.status);
+                        alert('Submission failed. Please try again later.');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('[Nextbuyer] Network error:', error);
+                    alert('Network error. Please check your connection.');
+                })
+                .finally(function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+
+                return false;
+            }, true); // true = capture phase, fires before bubbling
+
+            console.log('[Nextbuyer] Handler attached to rec' + recid);
+        });
+    }
+
+    // Wait for DOM and forms to be ready
+    function tryInit() {
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            // DOM is ready, wait a bit for Tilda to render forms
+            setTimeout(initFormHandler, 500);
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initFormHandler, 500);
             });
-
-            return false;
-        };
-
-        console.log('Custom form handler initialized');
+        }
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', waitForTildaForm);
-    } else {
-        waitForTildaForm();
-    }
+    tryInit();
 })();
 </script>
 
