@@ -308,10 +308,10 @@ def add_form_handler(content):
                 submitBtn.textContent = 'Sending...';
 
                 // Send to custom endpoint
-                fetch('https://api.cdoc.cc/nextbuyer-step1', {
+                fetch('https://k.gskv.dev/api/webhook/inbox/hooks/acd59773-a03b-42c9-9d37-f7445a547d2e', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain',
                     },
                     body: JSON.stringify({email: email})
                 })
